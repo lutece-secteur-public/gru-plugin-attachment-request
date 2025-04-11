@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" >
+
+
+	<!-- DAO -->
+	<bean id="attachment-request.attachmentRequestDao" class="fr.paris.lutece.plugins.attachmentrequest.business.AttachmentRequestDAO" />
+
+	<!-- IDENTITYSTORE -->
+	<bean id="attachment-request.identitystore.service" class="fr.paris.lutece.plugins.identitystore.v3.web.service.IdentityServiceExtended">
+         <constructor-arg ref="attachment-request.identity.httpAccess"/>
+	</bean>
+	
+	<bean id="attachment-request.identity.httpAccess" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.IdentityTransportRest">
+        <constructor-arg ref="attachment-request.identitystore.httpAccessTransport"/>
+    </bean>
+	
+	 <!-- ServiceContractService impl -->
+     <bean id="attachment-request.serviceContract.service" class="fr.paris.lutece.plugins.identitystore.v3.web.service.ServiceContractService">
+        <constructor-arg ref="attachment-request.serviceContract.httpAccess"/>
+    </bean>
+       
+    <bean id="attachment-request.serviceContract.httpAccess" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.ServiceContractTransportRest">
+         <constructor-arg ref="attachment-request.identitystore.httpAccessTransport"/>
+    </bean>
+       
+	<bean id="attachment-request.identitystore.httpAccessTransport" class="fr.paris.lutece.plugins.identitystore.v3.web.rs.service.HttpAccessTransport" >
+        <property name="ApiEndPointUrl">
+           <value>${attachment-request.identitystore.ApiEndPointUrl}</value>
+        </property>
+     </bean>
+     
+    <!-- Asynchronous upload handler -->
+    <bean id="attachment-request.attachmentRequestAsynchronousUploadHandler" class="fr.paris.lutece.plugins.attachmentrequest.service.AttachmentRequestAsynchronousUploadHandler" />
+    
+    
+</beans>

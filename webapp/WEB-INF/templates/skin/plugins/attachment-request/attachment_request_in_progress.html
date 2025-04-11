@@ -1,0 +1,33 @@
+<@cContainer>
+	<@cBlock class='p-sm-3 forms'>
+		<@row>
+			<@cCol cols='md-10 offset-md-1 col-xs-12'>
+				<@cTitle level=2 class='main-info-color mb-5'>Certifiez votre identit&eacute; par pi&egrave;ces justificatives</@cTitle>
+				<@cAlert title='' dismissible=false class='warning mb-xl'>
+					<@cText class='alert-title'>
+						Vous avez transmis une demande de certification par l'envoi de pi&egrave;ces justificatives le ${dateAttachmentRequest?string["dd/MM/yyyy"]!}
+						</br>Votre demande est actuellement en cours de traitement.
+					</@cText>
+				</@cAlert>
+				<@cText>
+					Pour poursuivre votre d&eacute;marche, la certification de votre identit&eacute; est requise.
+					Les documents que vous nous avez transmis sont actuellement en cours de traitement, 
+					vous serez inform&eacute; d&egrave;s que la certification sera finalis&eacute;e.
+				</@cText>
+				<@cAlert title='' dismissible=false class='primary mb-xl'>
+					<@cText class="mb-4">
+						<strong>Si vous &ecirc;tes utilisateur de FranceConnect:</strong> vous pouvez cliquer sur le bouton FranceConnect ci-dessous,
+						cela vous permettra de certifier votre identit&eacute; imm&eacute;diatement et de poursuivre votre d&eacute;marche						
+					</@cText>
+					<@fcBtnImg label='Certifier mon compte avec' type='url' url='jsp/site/Portal.jsp?page=fccertifier&cid=${(customerId)!}' /><br>
+				</@cAlert>				
+				<@row>
+					<@cCol class="text-center">
+						<a href="${serviceUrl!}" class="btn btn-primary">Revenir sur le service num&eacute;rique</a>
+						<a href="#" class="btn btn-primary">Mon Paris</a>						
+					</@cCol>
+				</@row>
+			</@cCol>
+		</@row>
+	</@cBlock>
+</@cContainer>

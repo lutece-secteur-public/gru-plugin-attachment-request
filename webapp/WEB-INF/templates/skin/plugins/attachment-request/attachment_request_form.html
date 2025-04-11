@@ -1,0 +1,253 @@
+<#if form_error?? && error.hasError()><@getErrorInfo error /></#if>
+<#include "/skin/plugins/asynchronousupload/upload_commons.html" />
+<@cBlock class='forms' class="offset-md-2">
+	<@cTitle level=2 class='main-info-color mb-5'>Certifiez votre identit&eacute; par pi&egrave;ces justificatives</@cTitle>
+	<@cForm name='form-profil' id='form-profil' params='enctype="multipart/form-data"' action='jsp/site/Portal.jsp'>				
+		<input type="hidden" id="page" name="page" value="attachmentrequest">
+		<input type="hidden" id="action" name="action" value="doAttachmentRequest">
+		<input type="hidden" id="token" name="token" value="${token!''}">
+			
+		<@cRow>
+			<@cCol cols='12 col-md-8'>
+				<#if canShowUserDataForm?? && canShowUserDataForm == true>
+				<@cField label='#i18n{attachmentrequest.pj_certification_form.labelGenre}' for='gender' required=true>
+					<@cSelect id='gender' name='gender' class='custom-select' helpMsg='Tel qu’indiqu&eacute; sur vos papiers d’identit&eacute;.' >
+						<#if genderlist??>
+							<#list genderlist as gender>
+								<#assign isSelected><#if identity?? && identity.gender=="${gender.code}">true<#else>false</#if></#assign>
+								<@cOption label=gender.name value=gender.code selected=isSelected?boolean  /> 
+							</#list>
+						</#if>
+					</@cSelect>	
+				</@cField>
+				<@cFormRow>
+					<@cCol>
+						<@cField label='#i18n{attachmentrequest.pj_certification_form.labelFirstName}' for='firstname' required=true> 
+							<@cInput name='firstname' value=(identity.firstname)!'' required=true maxlength=255 helpMsg='Veuillez saisir vos pr&eacute;nom(s).' placeholder='Ex. Jean' class='form-control' params='autocomplete="off"' />
+						</@cField>
+						<@errorMsg id='firstname' />
+					</@cCol>
+				</@cFormRow>
+				<@cFormRow>
+					<@cCol>
+						<@cField label='#i18n{attachmentrequest.pj_certification_form.labelBirthName}' for='lastName' required=true> 
+							<@cInput name='lastName' value=(identity.lastName)!'' required=true maxlength=255 helpMsg='Veuillez saisir  votre nom de naissance.' placeholder='Ex. Dupontel' class='form-control' params='autocomplete="off"' />
+						</@cField>
+						<@errorMsg id='lastName' />							
+					</@cCol>
+				</@cFormRow>
+				<@cFormRow>
+					<@cCol>
+						<@cField label='#i18n{attachmentrequest.pj_certification_form.labelName}' for='preferredUsername' required=false> 
+							<@cInput name='preferredUsername' id='preferredUsername' value=(identity.preferredUsername)!'' maxlength=255 helpMsg='Veuillez saisir votre nom d\'usage, tel qu\'il apparait sur votre document d\'identit&eacute;. Si vous pr&eacute;f&eacute;rez utiliser un autre nom que votre nom de naissance.' placeholder='Ex. Dupont' class='form-control' params='autocomplete="off"' />
+						</@cField>
+						<@errorMsg id='preferredUsername' />	
+					</@cCol>
+				</@cFormRow>
+				<@cFormRow>
+					<@cCol>
+						<@cField label='#i18n{attachmentrequest.pj_certification_form.labelBirthdate}' for='birthdate' required=true> 
+							<@cInput name='birthdate' value=identity.birthdate!'' required=true maxlength=255 helpMsg='Veuillez saisir votre date de naissance' class='form-control' placeholder='Ex. : 05/11/1974' />
+						</@cField>
+						<@errorMsg id='birthdate' />
+					</@cCol>
+				</@cFormRow>	
+				<#assign iconRemoveAC><@parisIcon name='close' title='#i18n{portal.util.labelDelete}' /></#assign>
+				<@cFormRow>
+					<@cCol col='12 col-md-4' id='birthCountryContainer'>
+						<@cBlock id='autocompleteBirthCountryDiv'>
+							<@input type='hidden' id='birthcountry_code' name='birthcountry_code' value='${identity.birthcountryCode!\'\'}'/>
+							<#assign helpAC=''>
+							<#if identity?? && !identity.birthdate?has_content><#assign helpAC><@cFormHelp id='birthcountry' label='Veuillez saisir votre date de naissance pour pouvoir modifier votre pays naissance.' /></#assign></#if>
+							<#assign iconSearchAC><@parisIcon name='search' title='#i18n{portal.util.labelSearch}' id='birthcountry-search-icon' class='lutece-autocomplete-search-icon' /></#assign>
+							<@autocompleteFO id="birthcountry" currentValue='${identity.birthcountry!\'\'}' name="birthcountry" searchLabel="#i18n{module.mydashboard.identity.xpage.edit_identity.generalinfo.labelBirthCountry}" required=true itemValueFieldName="value" suggestionsUrl="rest/geocodesclient/api/v1/countries?search=" suggestionsPath="result" itemTitleFieldNames='["value"]' minimumInputLength=3 additionnalRequestParamInputId="birthdate" copyFields='[{"inputName":"birthcountry_code","resultFieldName":"code"},{"inputName":"birthcountry","resultFieldName":"value"}]' help=helpAC iconSearch=iconSearchAC iconRemove=iconRemoveAC />
+						</@cBlock>
+						<@errorMsg id='birthcountry' />
+					</@cCol>
+				</@cFormRow>
+				<@cFormRow>
+					<@cCol col='12 col-md-4' id='birthPlaceContainer'>
+						<@cBlock id='autocompleteBirthPlaceDiv'>
+							<@input type='hidden' id='birthplace_code' name='birthplace_code' value='${identity.birthplaceCode!\'\'}'/>
+							<#assign helpAC=''>
+							<#assign helpACLabel>Veuillez saisir <#if identity?? && !identity.birthdate?has_content>votre date de naissance et </#if>votre pays de naissance pour pouvoir indiquer votre ville de naissance.</#assign>
+							<#if identity?? && !identity.birthcountry?has_content><#assign helpAC><@cFormHelp id='birthplace' label=helpACLabel /></#assign></#if>
+							<#assign iconSearchAC><@parisIcon name='search' title='#i18n{portal.util.labelSearch}' id='birthcountry-search-icon' class='lutece-autocomplete-search-icon' /></#assign>
+							<@autocompleteFO id="birthplace" currentValue='${identity.birthplace!\'\'}' name="birthplace" searchLabel="#i18n{module.mydashboard.identity.xpage.edit_identity.generalinfo.labelBirthPlace}" required=true itemValueFieldName="value" suggestionsUrl="rest/geocodesclient/api/v1/cities?search=" suggestionsPath="result" itemTitleFieldNames='["displayValue"]' minimumInputLength=3 additionnalRequestParamInputId="birthdate" copyFields='[{"inputName":"birthplace_code","resultFieldName":"code"},{"inputName":"birthplace","resultFieldName":"value"}]' help=helpAC iconSearch=iconSearchAC iconRemove=iconRemoveAC />
+							<@errorMsg id='birthplace' />
+						</@cBlock>
+					</@cCol>
+				</@cFormRow>
+				</#if>
+				<@cFormRow>
+					<@cCol>
+						<#assign helpMess = "<small>Document attendu :</br>
+						&nbsp;&nbsp;&nbsp;&nbsp;- Si vous &ecirc;tes de nationalit&eacute; française : carte d’identit&eacute; recto verso, ou passeport.</br>
+						&nbsp;&nbsp;&nbsp;&nbsp;- Si vous &ecirc;tes de nationalit&eacute; &eacute;trang&egrave;re : carte de r&eacute;sident, carte s&eacute;jour, ou, carte d’identit&eacute; recto verso ou passeport d&eacute;livr&eacute; par le pays d’origine.</br>
+						Formats autoris&eacute;s : pdf, png ou jpeg. Poids maximum autoris&eacute; : 2Mo par pi&egrave;ce fournie.</small>" />
+						<@cInputDropFiles name='attachments' label="Votre pi&egrave;ce d'identit&eacute; (CNI, password, titre de s&eacute;jour)" helpMsg=helpMess handler=handler multiple=true nbFiles=10 accept='pdf|png|jpeg|jpg' maxFileSize=2097152 required=true  />
+						<#if listFiles?has_content>
+						<#list listFiles as file>
+							<@cInputDropFilesItem name=file.fieldName label=file.name idx=file?index fileSize=file.size handler=handler  />
+						</#list>
+						</#if>
+					</@cCol>
+				</@cFormRow>
+			</@cCol>
+		</@cRow>
+		<!-- Save -->
+		<@cRow class='mt-xl'>
+			<@cCol>
+				<@cBtn name='action_doSaveStep' id='action_doSaveStep' label='#i18n{attachmentrequest.pj_certification_form.labelButtonValidate}' />
+				<#if serviceUrl??><@cLink href=serviceUrl class='btn btn-link-primary ml-2' label='#i18n{portal.util.labelCancel}' /> </#if>
+			</@cCol>
+		</@cRow>
+	</@cForm>
+</@cBlock>
+
+<@pageReady title='Compléter votre compte Mon Paris' hasPOI=true hasInputMask=true validator=true footerSocial=false >
+	const save=$('#save');
+	<#if canShowUserDataForm?? && canShowUserDataForm == true>
+	<#assign ruless>'login,preferredUsername,lastName,firstname,birthdateRequired,birthcountryRequired,birthplace,'</#assign>
+	<@validationRules id='form-profil' rules=ruless methods=['accentCheck','checkExtension','mobilePhoneCheck','phoneCheck','noNumbers','validDate','nameFilter']  />
+	<@inputMask id='birthdate' />
+	</#if>
+	/*  Save form management   */
+	var hasQuit=0;
+	$('.form-control').on('keyup', function(e){
+		save.show();
+	});
+	$('.form-control').on('change', function(e){
+		save.show();
+	});
+	
+	window.addEventListener( 'beforeunload' , function (e) {
+	if( isSubmited==0 ){
+		if( save.is(':visible') ){
+		if( hasQuit==0 ){
+			$('.nav-dashboard').after('<div class="main-bg-color py-4"><h2 class="text-white text-center">Vos modification n\'ont pas été enregistrées,<br>êtes-vous sûr de vouloir quitter cette page ?</h2></div>');
+			hasQuit=1;
+		}
+		// Cancel the event
+		e.preventDefault();
+		// Chrome requires returnValue to be set
+		e.returnValue = '';
+		}
+	}
+	});
+
+	/* Load css dynamically */
+	var loadresource = document.createElement('link');
+	loadresource.setAttribute("rel", "stylesheet");
+	loadresource.setAttribute("type", "text/css");
+	loadresource.setAttribute("href", "js/jquery/plugins/ui/css/jquery-ui.css");
+	document.getElementsByTagName("head")[0].appendChild(loadresource);
+	var jAdresse = $('#address');
+	var jAdressePostalcode =  $('#address_postalcode');
+	var jAdresseCity = $('#address_city');
+	jAdresse.suggestPOI();
+	jAdresse.bind($.suggestPOI.EVT_SELECT, function(event) {
+		//Use properties from BAN apiinput type. Would not work with suggestPOI.
+		jAdresse.val(event.poi.sourcePOI.properties.name);
+		jAdressePostalcode.val(event.poi.sourcePOI.properties.postcode);
+		jAdresseCity.val(event.poi.sourcePOI.properties.city);
+	});
+
+	<!-- Script validation des champs birthdate, birthcountry et birthplace -->
+	$("#address").on("keyup", function () {
+		$("#address_postalcode").removeClass("is-invalid");
+		$("#address_city").removeClass("is-invalid");
+	});
+
+	$("#address").blur( function(){
+		var str=$(this).val().trim(), match = str.match(/(\d{5})\s*(.*)/);
+		if (match){
+			var postalCode = match[1];
+			var city = match[2];
+			// Mise à jour des champs correspondants
+			$("#address_postalcode").val(postalCode);
+			$("#address_city").val(city);
+			// Suppression du code postal et de la ville de l'adresse
+			str = str.replace(match[0], '').trim();
+		}
+		// Mise à jour du champ adresse
+		$("#address").val(str.replace(/,$/, ''));
+	});
+
+	var birthplaceAutocompleteDiv = $("#autocompleteBirthPlaceDiv");
+	var birthplaceDiv = $('<div class="form-group" id="birthPlaceDiv">' +
+		'<label for="birthplace">Ville de naissance</label>' +
+		'<input class="form-control form-control-lg" value="${identity.birthplace!}" type="text" id="birthplace" name="birthplace" maxlength="255">' +
+		'</div>');
+
+	var birthCountryCodeInput = $("input[name='birthcountry_code']").val();
+	if (!isValidDate($("#birthdate").val())){
+		$("#birthcountry").find("input").prop("disabled", true);
+		$("#birthplace").find("input").prop("disabled", true);
+	} else if($("input[name='birthcountry']").val() == ''){
+		$("#birthplace").find("input").prop("disabled", true);
+	} else if($("input[name='birthcountry']").val().toUpperCase() != 'FRANCE'){
+		$("#autocompleteBirthPlaceDiv").remove();
+		birthplaceDiv.appendTo("#birthPlaceContainer");
+	}
+
+	$("#birthdate").keyup(function(){
+		if (isValidDate($(this).val())) {
+			$("#birthcountry").find("input").prop("disabled", false);
+		} else {
+			cleanBirthPlace(birthplaceAutocompleteDiv);
+			$("#birthcountry").find("input").prop("disabled", true);
+			$("#birthplace").find("input").prop("disabled", true);
+			$("input[name='birthcountry']").val('');
+			$("input[name='birthcountry_code']").val('');
+			$("#helpBirthPlace").remove();
+		}
+	});
+		
+	$("body").on('click success', function () {
+		if ( $("input[name='birthcountry_code']").val() != birthCountryCodeInput ) {
+			if ($("input[name='birthcountry']").val().toUpperCase() == 'FRANCE') {
+				cleanBirthPlace(birthplaceAutocompleteDiv);
+				$("#birthplace").find("input").prop("disabled", false);
+			} else if ($("input[name='birthcountry']").val() != '' && $("input[name='birthcountry']").val().toUpperCase() != 'FRANCE' && $("input[name='birthcountry_code']").val() != '') {
+				cleanBirthPlace(birthplaceDiv);
+			} else if ($("input[name='birthcountry']").val() == '') {
+				cleanBirthPlace(birthplaceAutocompleteDiv);
+				$("#birthplace").find("input").prop("disabled", true);
+			}
+			birthCountryCodeInput = $("input[name='birthcountry_code']").val();
+		}
+	});
+	
+	function cleanBirthPlace(divAppend) {
+		$("#birthPlaceDiv").remove();
+		$("#autocompleteBirthPlaceDiv").remove();
+		divAppend.appendTo("#birthPlaceContainer");
+		$("input[name='birthplace']").val('');
+		$("input[name='birthplace_code']").val('');
+	}
+
+	function isValidDate(dateString) {
+		if (dateString === '') { return false; }
+		return /^(?=\d)(?:(?:31(?!.(?:0?[2469]|11))|(?:30|29)(?!.0?2)|29(?=.0?2.(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(?:\x20|$))|(?:2[0-8]|1\d|0?[1-9]))([-.\/])(?:1[012]|0?[1-9])\1(?:1[6-9]|[2-9]\d)?\d\d(?:(?=\x20\d)\x20|$))?(((0?[1-9]|1[012])(:[0-5]\d){0,2}(\x20[AP]M))|([01]\d|2[0-3])(:[0-5]\d){1,2})?$/.test(dateString);
+	}
+
+</@pageReady>
+<@addRequiredJsFiles />
+<script src="jsp/site/plugins/asynchronousupload/GetMainUploadJs.jsp?handler=attachmentRequestAsynchronousUploadHandler" ></script>
+<#macro errorMsg id='' >
+	<#list errors as error>
+		<#if error?has_content && error.fieldName == id>
+			<small class="invalid-feedback"<#if id !=''> style="display: inline;" id="invalid-${id}"</#if>>${error.message!}</small>	
+			<script>
+				var invalidLabelId = 'invalid-${id}';
+				$('#${id}').closest('.form-control').addClass('is-invalid').attr('aria-invalid','true').attr('aria-describedby', invalidLabelId );
+				
+				$('#${id}').keyup(function(){
+					$('#'+invalidLabelId).remove();
+					$('#${id}').closest('.form-control').removeClass('is-invalid').attr('aria-invalid','false').attr('aria-describedby', '' );
+				});
+			</script>
+		</#if>
+	</#list>
+</#macro>
