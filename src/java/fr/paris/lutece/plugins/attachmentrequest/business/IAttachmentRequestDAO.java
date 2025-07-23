@@ -82,6 +82,15 @@ public interface IAttachmentRequestDAO
     AttachmentRequest load( int nKey );
 
 
+    /**
+     * Load the data from the table
+     * @param strCuid The cuid of the attachmentRequest
+     * @return The instance of the attachmentRequest
+     */
+
+    List<AttachmentRequest> loadByCuid( String strCuid );
+
+
 
      /**
      * Load the data of all the attachmentRequest objects and returns them as a List

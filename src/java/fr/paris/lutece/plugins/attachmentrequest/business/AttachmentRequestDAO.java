@@ -53,6 +53,7 @@ public final class AttachmentRequestDAO implements IAttachmentRequestDAO
     private static final String SQL_QUERY_DELETE    = "DELETE FROM attachment_request WHERE id = ? ";
     private static final String SQL_QUERY_UPDATE    = "UPDATE attachment_request SET id = ?, id_file = ?, customer_id = ?, client_code = ?, provider_name = ?, date_creation = ? WHERE id = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT id, id_file, customer_id, client_code, provider_name, date_creation FROM attachment_request";
+    private static final String SQL_QUERY_SELECT_BY_CUID = "SELECT id, id_file, customer_id, client_code, provider_name, date_creation FROM attachment_request WHERE customer_id = ?";
 
     /**
      * {@inheritDoc }
@@ -106,6 +107,38 @@ public final class AttachmentRequestDAO implements IAttachmentRequestDAO
     
             return attachmentRequest;
         }
+    }
+    
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<AttachmentRequest> loadByCuid( String strCuid )
+    {
+        List<AttachmentRequest> listAttachmentRequest = new ArrayList<>();
+
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_CUID ) )
+        {
+            daoUtil.setString( 1, strCuid );
+            daoUtil.executeQuery( );
+            
+            while ( daoUtil.next( ) )
+            {
+                AttachmentRequest attachmentRequest = new AttachmentRequest( );
+    
+                attachmentRequest.setId( daoUtil.getInt( "id" ) );
+                attachmentRequest.setIdFile( daoUtil.getInt( "id_file" ) );
+                attachmentRequest.setCustomerId( daoUtil.getString( "customer_id" ) );
+                attachmentRequest.setClientCode( daoUtil.getString( "client_code" ) );
+                attachmentRequest.setProviderName( daoUtil.getString( "provider_name" ) );
+                attachmentRequest.setDateCreation( daoUtil.getTimestamp( "date_creation" ) );
+                
+                listAttachmentRequest.add( attachmentRequest );
+            }   
+        }
+        return listAttachmentRequest;
+
     }
 
     /**

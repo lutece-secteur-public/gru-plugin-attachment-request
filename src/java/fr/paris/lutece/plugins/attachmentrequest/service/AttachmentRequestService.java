@@ -392,6 +392,15 @@ public class AttachmentRequestService
     }
     
     /**
+     * Gets list of attachment request by cuid
+     * @return list of attachment request
+     */
+    public static List<AttachmentRequest> getListAttachmentRequestByCuid ( String strCuid )
+    {
+       return AttachmentRequestHome.findByCuid( strCuid ); 
+    }
+    
+    /**
      * Create attachment request
      * @param attachmentRequest
      * @return attachment request created

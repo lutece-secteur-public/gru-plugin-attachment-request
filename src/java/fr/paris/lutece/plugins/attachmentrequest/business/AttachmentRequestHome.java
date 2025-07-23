@@ -111,6 +111,16 @@ public final class AttachmentRequestHome
         return _dao.load( nKey );
     }
 
+    /**
+     * Returns an instance of a attachmentRequest whose identifier is specified in parameter
+     * @param strCuid The attachmentRequest customer id
+     * @return an instance of AttachmentRequest
+     */
+
+    public static List<AttachmentRequest> findByCuid( String strCuid )
+    {
+        return _dao.loadByCuid( strCuid );
+    }
 
     /**
      * Load the data of all the attachmentRequest objects and returns them in form of a list

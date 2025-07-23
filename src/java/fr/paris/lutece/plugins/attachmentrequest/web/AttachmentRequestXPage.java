@@ -151,7 +151,8 @@ public class AttachmentRequestXPage extends MVCApplication
             }
             
             //If a task already exists then redirect the user
-            if ( identityDto != null && AttachmentRequestService.getIdentityTaskInProgress ( identityDto.getCustomerId( ) ) != null )
+            if ( identityDto != null && ( AttachmentRequestService.getIdentityTaskInProgress ( identityDto.getCustomerId( ) ) != null
+                    || !AttachmentRequestService.getListAttachmentRequestByCuid( identityDto.getCustomerId( ) ).isEmpty( ) ) )
             {
                 return redirectView( request, VIEW_IN_PROGRESS_ATTACHMENT_REQUEST );
             }
@@ -226,7 +227,8 @@ public class AttachmentRequestXPage extends MVCApplication
             AttachmentRequestUtils.updateIdentityDto( identityDto, identityFormDTO );
             
             //If a task already exists then redirect the user
-            if ( AttachmentRequestService.getIdentityTaskInProgress ( identityDto.getCustomerId( ) ) != null )
+            if ( AttachmentRequestService.getIdentityTaskInProgress ( identityDto.getCustomerId( ) ) != null 
+                    || !AttachmentRequestService.getListAttachmentRequestByCuid( identityDto.getCustomerId( ) ).isEmpty( ) )
             {
                 return redirectView( request, VIEW_IN_PROGRESS_ATTACHMENT_REQUEST );
             }
@@ -366,6 +368,15 @@ public class AttachmentRequestXPage extends MVCApplication
             {
                 model.put( MARK_DATE_ATTACHEMENT_REQUEST, identityTaskDto.getCreationDate( ) );
             }
+            else
+            {
+                List<AttachmentRequest> listAttachmentRequest = AttachmentRequestService.getListAttachmentRequestByCuid( identityDto.getCustomerId( ) );
+                if( !listAttachmentRequest.isEmpty( ) )
+                {
+                    model.put( MARK_DATE_ATTACHEMENT_REQUEST, listAttachmentRequest.get( 1 ).getDateCreation( ) );
+                }
+            }
+            
             model.put( MARK_CUSTOMER_ID, identityDto.getCustomerId( ) );
             getServiceUrl( request, model );
         }
