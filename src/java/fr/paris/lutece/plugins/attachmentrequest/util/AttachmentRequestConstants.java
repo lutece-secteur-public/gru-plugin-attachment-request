@@ -75,5 +75,6 @@ public class AttachmentRequestConstants
     public static final String PROPERTY_USER_INFO_DISPLAY_MAX_LEVEL                 = "attachment-request.user-info-block.display.max_level";
     public static final String PROPERTY_ACCESS_PROCESS_ATTACHMENT_REQUEST_MIN_LEVEL = "attachment-request.access.process.attachment.request.min_level";
     public static final String PROPERTY_ACCESS_PROCESS_ATTACHMENT_REQUEST_MAX_LEVEL = "attachment-request.access.process.attachment.request.max_level";
-
+    
+    public static final String MESSAGE_ERROR_ATTACHMENT                             = "attachmentrequest.pj_certification_form.error.message.attachment.empty";
 }

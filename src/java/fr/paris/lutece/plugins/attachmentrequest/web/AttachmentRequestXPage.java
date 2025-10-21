@@ -33,11 +33,13 @@
  */
 package fr.paris.lutece.plugins.attachmentrequest.web;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,6 +48,7 @@ import fr.paris.lutece.plugins.attachmentrequest.business.AttachmentRequest;
 import fr.paris.lutece.plugins.attachmentrequest.business.IdentityFormDTO;
 import fr.paris.lutece.plugins.attachmentrequest.service.AttachmentRequestService;
 import fr.paris.lutece.plugins.attachmentrequest.service.listener.IAttachmentRequestListener;
+import fr.paris.lutece.plugins.attachmentrequest.util.AttachmentRequestConstants;
 import fr.paris.lutece.plugins.attachmentrequest.util.AttachmentRequestUtils;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.common.IdentityDto;
 import fr.paris.lutece.plugins.identitystore.v3.web.rs.dto.contract.ServiceContractSearchResponse;
@@ -54,6 +57,7 @@ import fr.paris.lutece.plugins.verifybackurl.service.AuthorizedUrlService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.file.FileService;
 import fr.paris.lutece.portal.service.file.FileServiceException;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.security.UserNotSignedException;
@@ -115,6 +119,8 @@ public class AttachmentRequestXPage extends MVCApplication
     private static final String        PROPERTY_KEY_GENDER_LIST                      = AppPropertiesService.getProperty( "attachment-request.application.listref.gender" );
     private static final String        PROPERTY_BUCKET_PREFIX                        = AppPropertiesService.getProperty( "attachment-request.bucket.prefix" );
     private static final String        MESSAGE_ERROR_TOKEN                           = "Invalid Security Token";
+    
+    private static final String        ERROR_ATTACHMENTS                             = "attachments";
 
     private String                     _strAppCode                                   = null;
     private List<IAttachmentRequestListener> _listPjCertifierListener                = SpringContextService.getBeansOfType( IAttachmentRequestListener.class );
@@ -133,7 +139,7 @@ public class AttachmentRequestXPage extends MVCApplication
         IdentityFormDTO identityFormDTO = new IdentityFormDTO( );
         String strAppCode = request.getParameter( PARAMETER_CODE_APP );
         
-        if( _strAppCode == null || ( StringUtils.isEmpty( strAppCode ) && !strAppCode.equals( _strAppCode ) ) )
+        if( _strAppCode == null || ( StringUtils.isNotEmpty( strAppCode ) && !strAppCode.equals( _strAppCode ) ) )
         {
             _strAppCode = strAppCode;
         }
@@ -200,6 +206,7 @@ public class AttachmentRequestXPage extends MVCApplication
 
         try
         {
+            Map<String, String> hashErrors = new HashMap<>();
             //Identity data
             IdentityDto identityDto = AttachmentRequestService.getIdentityByGuid( luteceUser.getName( ) );
             boolean canShowUserDataForm = AttachmentRequestUtils.canShowUserDataForm( identityDto );
@@ -209,12 +216,18 @@ public class AttachmentRequestXPage extends MVCApplication
                 populate( identityFormDTO, request );
         
                 //Checking that the data entered in the form does not contain any errors
-                Map<String, String> hashErros = AttachmentRequestUtils.checkIdentityForm( identityFormDTO );
-                if ( !hashErros.isEmpty( ) )
-                {
-                    hashErros.forEach( ( x, y ) -> addError( y, x ) );
-                    return redirectView( request, VIEW_ATTACHMENT_REQUEST );
-                }
+                hashErrors.putAll(AttachmentRequestUtils.checkIdentityForm( identityFormDTO ));
+            }
+            
+            if( CollectionUtils.isEmpty( _handler.getListUploadedFiles( PARAMETER_ATTACHMENTS, request.getSession( )) ) )
+            {
+                hashErrors.put( ERROR_ATTACHMENTS, I18nService.getLocalizedString( AttachmentRequestConstants.MESSAGE_ERROR_ATTACHMENT, request.getLocale( ) ) );
+            }
+                      
+            if ( !hashErrors.isEmpty( ) )
+            {
+                hashErrors.forEach( ( x, y ) -> addError( y, x ) );
+                return redirectView( request, VIEW_ATTACHMENT_REQUEST );
             }
             
             //Block if unable to complete attachment request

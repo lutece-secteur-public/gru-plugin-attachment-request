@@ -23,7 +23,7 @@
 				<@cFormRow>
 					<@cCol>
 						<@cField label='#i18n{attachmentrequest.pj_certification_form.labelFirstName}' for='firstname' required=true> 
-							<@cInput name='firstname' value=(identity.firstname)!'' required=true maxlength=255 helpMsg='Veuillez saisir vos pr&eacute;nom(s).' placeholder='Ex. Jean' class='form-control' params='autocomplete="off"' />
+							<@cInput name='firstname' value=(identity.firstname)!'' required=true maxlength=255 helpMsg='Veuillez saisir votre/vos pr&eacute;nom(s).' placeholder='Ex. Jean' class='form-control' params='autocomplete="off"' />
 						</@cField>
 						<@errorMsg id='firstname' />
 					</@cCol>
@@ -74,8 +74,8 @@
 							<#if identity?? && !identity.birthcountry?has_content><#assign helpAC><@cFormHelp id='birthplace' label=helpACLabel /></#assign></#if>
 							<#assign iconSearchAC><@parisIcon name='search' title='#i18n{portal.util.labelSearch}' id='birthcountry-search-icon' class='lutece-autocomplete-search-icon' /></#assign>
 							<@autocompleteFO id="birthplace" currentValue='${identity.birthplace!\'\'}' name="birthplace" searchLabel="#i18n{module.mydashboard.identity.xpage.edit_identity.generalinfo.labelBirthPlace}" required=true itemValueFieldName="value" suggestionsUrl="rest/geocodesclient/api/v1/cities?search=" suggestionsPath="result" itemTitleFieldNames='["displayValue"]' minimumInputLength=3 additionnalRequestParamInputId="birthdate" copyFields='[{"inputName":"birthplace_code","resultFieldName":"code"},{"inputName":"birthplace","resultFieldName":"value"}]' help=helpAC iconSearch=iconSearchAC iconRemove=iconRemoveAC />
-							<@errorMsg id='birthplace' />
 						</@cBlock>
+						<@errorMsg id='birthplace' />
 					</@cCol>
 				</@cFormRow>
 				</#if>
@@ -88,9 +88,10 @@
 						<@cInputDropFiles name='attachments' label="Votre pi&egrave;ce d'identit&eacute; (CNI, password, titre de s&eacute;jour)" helpMsg=helpMess handler=handler multiple=true nbFiles=10 accept='pdf|png|jpeg|jpg' maxFileSize=2097152 required=true  />
 						<#if listFiles?has_content>
 						<#list listFiles as file>
-							<@cInputDropFilesItem name=file.fieldName label=file.name idx=file?index fileSize=file.size handler=handler  />
+							<@cInputDropFilesItem name=file.fieldName label=file.name idx=file?index fileSize=file.size handler=handler/>
 						</#list>
 						</#if>
+						<@errorMsg id='attachments' />						
 					</@cCol>
 				</@cFormRow>
 			</@cCol>
@@ -108,7 +109,7 @@
 <@pageReady title='Compléter votre compte Mon Paris' hasPOI=true hasInputMask=true validator=true footerSocial=false >
 	const save=$('#save');
 	<#if canShowUserDataForm?? && canShowUserDataForm == true>
-	<#assign ruless>'login,preferredUsername,lastName,firstname,birthdateRequired,birthcountryRequired,birthplace,'</#assign>
+	<#assign ruless>'login,preferredUsername,lastName,firstname,birthdateRequired,birthcountryRequired,birthplaceRequired,'</#assign>
 	<@validationRules id='form-profil' rules=ruless methods=['accentCheck','checkExtension','mobilePhoneCheck','phoneCheck','noNumbers','validDate','nameFilter']  />
 	<@inputMask id='birthdate' />
 	</#if>
@@ -219,6 +220,25 @@
 		}
 	});
 	
+	//Replace the error message for fileinput
+	const target = document.querySelector('.group-files');
+	
+	if (target) {
+	  new MutationObserver(mutations => {
+	    mutations.forEach(mutation => {
+	      mutation.addedNodes.forEach(node => {
+	        if (
+	          node.nodeType === 1 &&
+	          node.tagName === 'DIV' &&
+	          node.classList.contains('invalid-feedback')
+	        ) {
+	          node.textContent = 'Veuillez fournir la copie d’une de vos pièces d’identité.';
+	        }
+	      });
+	    });
+	  }).observe(target, { childList: true, subtree: true });
+	}
+	
 	function cleanBirthPlace(divAppend) {
 		$("#birthPlaceDiv").remove();
 		$("#autocompleteBirthPlaceDiv").remove();
@@ -247,6 +267,12 @@
 					$('#'+invalidLabelId).remove();
 					$('#${id}').closest('.form-control').removeClass('is-invalid').attr('aria-invalid','false').attr('aria-describedby', '' );
 				});
+				
+				//File input
+				<#if id == 'attachments'>
+				$('#lbattachments').addClass('main-danger-color');
+				$('#group-attachments').addClass('is-invalid');
+				</#if>
 			</script>
 		</#if>
 	</#list>
