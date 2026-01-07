@@ -386,7 +386,7 @@ public class AttachmentRequestXPage extends MVCApplication
                 List<AttachmentRequest> listAttachmentRequest = AttachmentRequestService.getListAttachmentRequestByCuid( identityDto.getCustomerId( ) );
                 if( !listAttachmentRequest.isEmpty( ) )
                 {
-                    model.put( MARK_DATE_ATTACHEMENT_REQUEST, listAttachmentRequest.get( 1 ).getDateCreation( ) );
+                    model.put( MARK_DATE_ATTACHEMENT_REQUEST, listAttachmentRequest.get( 0 ).getDateCreation( ) );
                 }
             }
             
