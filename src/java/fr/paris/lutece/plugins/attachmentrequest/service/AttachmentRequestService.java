@@ -345,7 +345,7 @@ public class AttachmentRequestService
     {
         RequestAuthor requestAuthor = new RequestAuthor( );
         requestAuthor.setName( PROPERTY_IDENTITY_CLIENT_CODE );
-        requestAuthor.setType( AuthorType.owner );
+        requestAuthor.setType( AuthorType.application );
         return requestAuthor;
     }
     
